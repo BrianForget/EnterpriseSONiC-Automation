@@ -1,0 +1,41 @@
+---
+# 'Test Playbook to configure some VLANs and ports'
+- hosts: all
+  connection: httpapi
+  gather_facts: false
+  collections:
+    - dellemc.enterprise_sonic
+
+  tasks:
+  - name: Configure hostname and interface_naming standard
+    sonic_system:
+      config: '{{ sonic_system }}'
+    when: sonic_system is defined
+
+  - name: Create VLANs
+    sonic_vlans:
+      config: '{{ sonic_vlans }}'
+    when: sonic_vlans is defined
+
+  - name: No Shutdown ports and set descriptions
+    sonic_interfaces:
+      config: '{{ sonic_interfaces }}'
+    when: sonic_interfaces is defined
+
+  - name: Add VLANs to ports
+    sonic_l2_interfaces:
+      config: '{{ sonic_l2_interfaces }}'
+    when: sonic_l2_interfaces is defined
+
+  - name: Create routed interfaces
+    sonic_l3_interfaces:
+      config: '{{ sonic_l3_interfaces }}'
+    when: sonic_l3_interfaces is defined
+
+  - name: Write memory on Switch
+    connection: network_cli
+    sonic_command:
+      commands:
+        - command: 'write memory'
+
+# code: language=ansible

@@ -1,0 +1,68 @@
+sonic_system:
+  # Commenting out to try dynamic hostname assignment.
+  #hostname: 'sonic-1'
+  hostname: '{{ inventory_hostname }}'
+  interface_naming: standard
+
+sonic_vlans:
+- vlan_id: 1
+- vlan_id: 10
+- vlan_id: 20
+
+sonic_interfaces:
+- name: Eth1/1
+  description: Server-1
+  enabled: true
+- name: Eth1/2
+  description: Server-2
+  enabled: true
+- name: Eth1/3
+  description: Server-3
+  enabled: true
+- name: Eth1/8
+  description: '"Trunk to sonic-2"'
+  enabled: true
+- name: Loopback0
+  description: router-id
+  #enabled: true
+  #should be enabled by default, but setting it as true to be safe.
+
+sonic_l2_interfaces:
+- name: Eth1/1
+  access:
+    vlan: 1
+- name: Eth1/2
+  access:
+    vlan: 10
+- name: Eth1/8
+  access:
+    vlan: 1
+  trunk:
+    allowed_vlans:
+      - vlan: 10
+      - vlan: 20
+
+sonic_l3_interfaces:
+- name: Management0
+  ipv4:
+    addresses:
+    - address: 192.168.131.133/24
+- name: Loopback0
+  ipv4:
+    addresses:
+    - address: 172.16.1.1/32
+- name: Vlan1
+  ipv4:
+    addresses:
+    - address: 10.0.0.1/24
+- name: Vlan10
+  ipv4:
+    addresses:
+    - address: 10.0.10.1/24
+- name: Vlan20
+  ipv4:
+    addresses:
+    - address: 10.0.20.1/24
+
+
+# Code: language=ansible
