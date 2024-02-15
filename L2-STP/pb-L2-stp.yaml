@@ -1,0 +1,57 @@
+---
+- hosts: all
+  connection: httpapi
+  gather_facts: false
+  collections:
+     - dellemc.enterprise_sonic
+
+  tasks:
+  - name: Set interface_naming to standard
+    sonic_system:
+      config:
+        hostname: '{{ inventory_hostname }}'
+        interface_naming: standard
+
+  - name: Configure single instance of MSTP 0 and stp_priority
+    connection: network_cli
+    sonic_config:
+      lines:
+        - spanning-tree mode mst
+        - spanning-tree mst 0 priority {{ stp_priority }}
+
+  - name: Create VLANs
+    sonic_vlans:
+      config: "{{ sonic_vlans }}"
+    when: sonic_vlans is defined and sonic_vlans
+
+  - name: Define and Enable Ports
+    sonic_interfaces:
+      config: "{{ sonic_interfaces }}"
+    when: sonic_interfaces is defined and sonic_interfaces
+
+  - name: Configure Access and Trunk Ports
+    sonic_l2_interfaces:
+      config: "{{ sonic_l2_interfaces }}"
+    when: sonic_l2_interfaces is defined and sonic_l2_interfaces
+  
+  - name: Configure edge_ports on Access Switches
+    connection: network_cli
+    sonic_config:
+      src: edge_port_cfg.j2
+    tags:
+      - jinja
+      - network_cli
+    register: result
+
+  - name: Assign Loopback0 IPv4 Address
+    sonic_l3_interfaces:
+      config: "{{ sonic_l3_interfaces }}"
+    when: sonic_l3_interfaces is defined and sonic_l3_interfaces
+
+  - name: Write memory on Switch
+    connection: network_cli
+    sonic_command:
+      commands:
+        - command: 'write memory'
+    tags:
+      - network_cli

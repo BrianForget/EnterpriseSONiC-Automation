@@ -1,0 +1,31 @@
+sonic_interfaces:
+   - name: Eth1/1
+     description: '"Trunk to access-1"'
+     enabled: true
+   - name: Eth1/2
+     description: '"Trunk to access-2"'
+     enabled: true
+   - name: Eth1/3
+     description: '"Trunk to access-25"'
+     enabled: true
+   - name: loopback0
+
+sonic_l2_interfaces:
+   - name: Eth1/1
+     access:
+       vlan: 1
+     trunk:
+       allowed_vlans:
+         - vlan: 10-20
+   - name: Eth1/2
+     access:
+       vlan: 1
+     trunk:
+       allowed_vlans:
+         - vlan: 10-20
+   - name: Eth1/3
+     access:
+       vlan: 1
+     trunk:
+       allowed_vlans:
+         - vlan: 10-20

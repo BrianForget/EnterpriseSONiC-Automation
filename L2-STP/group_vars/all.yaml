@@ -1,0 +1,45 @@
+sonic_vlans:
+  - vlan_id: 1
+  - vlan_id: 10
+    description: '"This is VLAN 10"'
+  - vlan_id: 11
+  - vlan_id: 12
+  - vlan_id: 13
+  - vlan_id: 14
+  - vlan_id: 15
+  - vlan_id: 16
+  - vlan_id: 17
+  - vlan_id: 18
+  - vlan_id: 19
+  - vlan_id: 20
+    description: '"This is VLAN 20"'
+
+sonic_l3_interfaces:
+   - name: loopback0
+     ipv4:
+       addresses: 
+        - address: "{{ loopback0_ip }}"
+
+host_data:
+    dist-1:
+      stp_priority: 4096
+      loopback0_ip: 172.16.31.1/32
+    dist-2:
+      stp_priority: 8192
+      loopback0_ip: 172.16.31.2/32
+    access-1:
+      stp_priority: 61440
+      loopback0_ip: 172.16.31.101/32
+      edge_ports: Eth 1/1-1/7
+    access-2:
+      stp_priority: 61440
+      loopback0_ip: 172.16.31.102/32
+      edge_ports: Eth 1/1-1/7
+    access-25:
+      stp_priority: 61440
+      loopback0_ip: 172.16.31.125/32
+      edge_ports: Eth 1/1-1/7
+
+loopback0_ip: "{{ host_data[inventory_hostname].loopback0_ip }}"
+
+stp_priority: "{{ host_data[inventory_hostname].stp_priority }}"

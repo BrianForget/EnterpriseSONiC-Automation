@@ -1,0 +1,47 @@
+sonic_interfaces:
+   - name: Eth1/1
+     description: '"Access to PC"'
+     enabled: true
+   - name: Eth1/2
+     description: '"Access to PC"'
+     enabled: true
+   - name: Eth1/8
+     description: '"Trunk to dist-1"'
+     enabled: true
+   - name: Eth1/9
+     description: '"Trunk to dist-2"'
+     enabled: true
+   - name: loopback0
+
+sonic_l2_interfaces:
+   - name: Eth1/1
+     access:
+       vlan: 10
+   - name: Eth1/2
+     access:
+       vlan: 20
+   - name: Eth1/8
+     access:
+       vlan: 1
+     trunk:
+       allowed_vlans:
+         - vlan: 10-20
+   - name: Eth1/9
+     access:
+       vlan: 1
+     trunk:
+       allowed_vlans:
+         - vlan: 10-20
+
+edge_port_config: "{{ host_data[inventory_hostname] }}"
+#  - lines: 
+#      - spanning-tree port type edge
+#    parents: ["{% for my_edge_ports in host_data[inventory_hostname].edge_ports %}interface {{ my_edge_ports }}\r{% endfor %}"]
+#  - "{{ edge_port_cfg }}"
+#  - edge_ports: Eth 1/1
+#  - edge_ports: Eth 1/2
+#  - edge_ports: Eth 1/3
+#  - edge_ports: Eth 1/4
+#  - edge_ports: Eth 1/5
+#  - edge_ports: Eth 1/6
+#  - edge_ports: Eth 1/7

@@ -1,0 +1,13 @@
+---
+# 'Test Playbook to Write memory on SONiC switch'
+- hosts: all
+  gather_facts: no
+  collections:
+    - dellemc.enterprise_sonic
+
+  tasks:
+  - name: Write memory on Switch
+    connection: network_cli
+    sonic_command:
+      commands:
+        - command: 'write memory'

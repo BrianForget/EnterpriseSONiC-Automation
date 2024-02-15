@@ -1,0 +1,53 @@
+sonic_system:
+  hostname: '{{ inventory_hostname }}'
+  interface_naming: standard
+
+sonic_vlans:
+- vlan_id: 1
+- vlan_id: 12
+- vlan_id: 22
+
+sonic_interfaces:
+- name: Eth1/1
+  description: Server-1
+  enabled: true
+- name: Eth1/2
+  description: Server-2
+  enabled: true
+- name: Eth1/3
+  description: Server-3
+  enabled: true
+- name: Eth1/8
+  description: '"Trunk to spine-1"'
+  enabled: true
+- name: Loopback0
+  description: router-id
+  #enabled: true
+  #should be enabled by default, but setting it as true to be safe.
+
+sonic_l2_interfaces:
+- name: Eth1/1
+  access:
+    vlan: 12
+- name: Eth1/2
+  access:
+    vlan: 22
+- name: Eth1/8
+  access:
+    vlan: 1
+  trunk:
+    allowed_vlans:
+      - vlan: 12
+      - vlan: 22
+
+sonic_l3_interfaces:
+- name: Management0
+  ipv4:
+    addresses:
+    - address: 192.168.131.136/24
+- name: Loopback0
+  ipv4:
+    addresses:
+    - address: 172.16.1.6/32
+
+# Code: language=ansible

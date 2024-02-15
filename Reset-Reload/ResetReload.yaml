@@ -1,0 +1,84 @@
+---
+- name: Test Playbook to Write Erase and Reboot SONiC switch
+  hosts: network
+  connection: network_cli
+  gather_facts: false
+  collections:
+    - dellemc.enterprise_sonic
+  tasks:
+  - name: Write Erase Switch
+    sonic_command:
+      commands:
+        - command: 'write erase'
+          prompt: '\[y/N\]:$'
+          answer: 'y'
+
+#         I am using 'write erase' here so that the user account and Management 0 ip are not lost.
+#
+#          -'write erase boot' removes Management 0 configuration and non-default
+#             user accounts.
+#
+#          -'write erase install' removes those and starts ZTP on next boot.
+
+#         I needed to add the '\' characters into the expected text in the prompt for it to work
+#          without it the square brackets '[]' seemed to confuse the search pattern.
+#          The '$' seems to indicate that we want to match the text at the end.
+#
+#           The actual text is 'Existing switch configuration files except management interface configuration will be removed, continue? [y/N]:'
+#
+#            Sample snippet inspiration text
+#                        Source: https://github.com/ansible-collections/dellemc.enterprise_sonic/blob/main/playbooks/common_examples/sonic_command.yaml
+#
+#               - name: Test SONiC command with prompt handling
+#                 sonic_command:
+#                   commands:
+#                     - command: 'image remove all'
+#                       prompt: '\[y/N\]:$'
+#                       answer: 'N'
+#                 register: cmd_op
+
+  - name: Reboot Switch with ansible reboot
+    connection: ssh
+    become: true
+    ansible.builtin.reboot:
+      reboot_command: '/usr/local/bin/reboot'
+      msg: 'Reboot initiated by Ansible'
+      connect_timeout: 5
+      reboot_timeout: 300
+      pre_reboot_delay: 3
+      post_reboot_delay: 45
+      test_command: whoami
+
+#     Initially the 'reboot' command kept rebooting the ansible server instead of the switch
+#      To fix that I had to specify the 'connection: ssh' for this task, otherwise ansible
+#      was falling back to running it on the local host when the 'connection: network_cli'
+#      failed for this default reboot module.
+
+#     Without the "reboot_command: '/usr/local/bin/reboot'" the switch would reboot with
+#      an error about kdump, and on reboot would not know why it had rebooted.
+#      After specifying the location of the reboot command on the switch it reboots as if
+#      the command were typed in by the ansible_user.
+#      The 'reboot_command' feature was added in ansible_core 2.11
+
+#     The remainder of the reboot arguments allow the module to re-connect to the switch
+#      after the reboot to confirm that the task was successful
+#      It should be possible to have further tasks after this one that could configure
+#      the switch with the safe assumption that it is defaulted
+
+#
+#
+#     This one does Not reboot the switch, but the Task hangs and the playbook eventually times out.
+#
+#      - name: Reboot Switch
+#        sonic_command:
+#         commands: 'reboot'
+#
+#
+#     This is the one that rebooted my Ansible control server :-P
+#      That was because I was trying to use this default ansible module with the network_cli
+#      connection method and that caused ansible to fall back to the local host as the target.
+#
+#      - name: Reboot Switch from bash
+#        ansible.builtin.shell:
+#          cmd: 'reboot'
+#        become: true

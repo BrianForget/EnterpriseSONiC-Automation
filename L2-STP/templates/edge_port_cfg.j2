@@ -1,0 +1,15 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+{#######################################
+
+#Purpose:
+STP edge port configuration for SONiC devices
+
+#######################################}
+{# edge port config start #}
+{% if edge_port_config is defined and edge_port_config %}
+    {% for my_edge_ports in edge_port_config %}
+interface {{ my_edge_ports.edge_ports }}
+spanning-tree port type edge
+    {% endfor %}
+{% endif %}
+{# edge port config end #}
