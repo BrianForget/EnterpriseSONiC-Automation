@@ -1,0 +1,73 @@
+---
+- hosts: all
+  connection: httpapi
+  gather_facts: false
+  name: "Jinja Playbook Test"
+
+
+  tasks:
+  - name: Set interface_naming to standard
+#    This will set the hostname of a Dell Enterprise SONiC switch to be the same
+#     as the name defined in the 'inventory.ini' file.
+#
+#    Interface-naming will also be set to 'standard' for the 'Eth1/1' style naming.
+    dellemc.enterprise_sonic.sonic_system:
+      config:
+        hostname: '{{ inventory_hostname }}'
+        interface_naming: standard
+
+  - name: Create VLANs
+#    This will create VLANs on Dell Enterprise SONiC switchs.
+#
+#    Ansible will look for the 'sonic_vlans' variable in the
+#     'group_vars' and 'host_vars' files to define which VLANs
+#      should be created for each switch or group of switches.
+#     Here, I expect VLANs to be created on the 'access' switches.
+    dellemc.enterprise_sonic.sonic_vlans:
+      config: "{{ sonic_vlans }}"
+    when: sonic_vlans is defined
+
+  - name: Define and Enable Ports
+#    This will enable ports, set their description, and create Loopback
+#     interfaces on Dell Enterprise SONiC switchs.
+#    Ansible will look for the 'sonic_interfaces' variable in the
+#     'group_vars' and 'host_vars' files to define which interfaces
+#      to enable or create for each switch or group of switches.
+#     Here, I expect VLANs to be created on the 'access' switches.
+    dellemc.enterprise_sonic.sonic_interfaces:
+      config: "{{ sonic_interfaces }}"
+    when: sonic_interfaces is defined
+    tags: enable
+
+
+  - name: Set IP Addresses
+#    This will create L3 interfaces on Dell Enterprise SONiC switchs.
+#
+#    Ansible will look for the 'sonic_l3_interfaces' variable in the
+#     'group_vars' and 'host_vars' files to define which L3 interfaces
+#      should be created for each switch or group of switches.
+#     In this project IPs are assigned in the 'network.yaml' 'group_vars' file,
+#      in the dictionary 'host_data'
+#     If a port (ex: Eth1/1) will be an L3 interface for all switches,
+#      then define that interface in the 'networking.yaml' 'group_vars' file
+#
+#     If a port (ex: Eth1/1) will be an L3 interface for all switches
+#      in a group, then define that interface in the 'group_vars' file
+#      for that group.
+#
+#     If a port (ex: Eth1/1) will be an L3 interface for a single switch,
+#      then define that interface in the 'host_vars' file for that switch.
+#
+    dellemc.enterprise_sonic.sonic_l3_interfaces:
+      config: "{{ sonic_l3_interfaces }}"
+    when: sonic_l3_interfaces
+    tags: addr
+
+  - name: Write memory on Switch
+#    This will save the configuration on Dell Enterprise SONiC switchs to survive a reboot.
+#
+    connection: network_cli
+    dellemc.enterprise_sonic.sonic_command:
+      commands:
+        - command: 'write memory'
+    tags: save

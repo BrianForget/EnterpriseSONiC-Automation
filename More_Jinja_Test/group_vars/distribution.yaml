@@ -1,0 +1,39 @@
+# Ports for all switches in the 'distribution' group are enabled and descriptions are
+#  set here.
+# Loopback interfaces must be added to create them.  Currently they do not need to be
+#  set as 'enabled'.
+# If ports need to be added per switch they should be added as 'sonic_interfaces:' in
+#  the same format for that switch's 'host_vars' file.
+sonic_interfaces:
+  - name: Eth1/1
+    description: '"Routed link to access-1"'
+    enabled: true
+  - name: Eth1/2
+    description: '"Routed link to access-2"'
+    enabled: true
+  - name: Eth1/3
+    description: '"Routed link to ccess-25"'
+    enabled: true
+  - name: loopback0
+
+# L3 interfaces for all switches in the 'distribution' group set here.
+#
+# If L3 interfaces need to be added per switch they should be added as 'sonic_l3_interfaces:'
+#   in the same format for that switch's 'host_vars' file.
+#
+# This performs a lookup to 'host_data' dictionary in 'network.yaml'
+sonic_l3_interfaces:
+  - name: Eth1/1
+    ipv4:
+      addresses:
+        - address: '{{ host_data[inventory_hostname].ip_eth1_1 }}'
+  - name: Eth1/2
+    ipv4:
+      addresses:
+        - address: '{{ host_data[inventory_hostname].ip_eth1_2 }}'
+  - name: Eth1/3
+    ipv4:
+      addresses:
+        - address: '{{ host_data[inventory_hostname].ip_eth1_3 }}'   
+
+

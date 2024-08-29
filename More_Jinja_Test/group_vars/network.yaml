@@ -1,0 +1,38 @@
+# Configures Loopback 0 for all switches.
+#  Performs a lookup to 'host_data' dictionary below.
+# Additional Loopback interfaces also need to be added to the group_vars or host_vars
+#   file under 'sonic_interfaces:' for that group or switch to create the Loopback.
+
+sonic_l3_interfaces:
+   - name: loopback0
+     ipv4:
+       addresses: 
+         - address: '{{ host_data[inventory_hostname].loopback0_ip }}'
+
+# Add IP's for any switch in playbook here.
+# Additional interfaces also need to be added to the group_vars or host_vars
+#   file under 'sonic_interfaces:' for that group or switch for the port
+#   to be enabled.
+host_data:
+  dist1:
+    loopback0_ip: 172.16.31.1/32
+    ip_eth1_1: 10.0.0.0/31
+    ip_eth1_2: 10.0.0.2/31
+    ip_eth1_3: 10.0.0.4/31
+  dist2:
+    loopback0_ip: 172.16.31.2/32
+    ip_eth1_1: 10.0.0.6/31
+    ip_eth1_2: 10.0.0.8/31
+    ip_eth1_3: 10.0.0.10/31
+  access1:
+    loopback0_ip: 172.16.31.101/32
+    ip_eth1_1: 10.0.0.1/31
+    ip_eth1_2: 10.0.0.7/31
+  access2:
+    loopback0_ip: 172.16.31.102/32
+    ip_eth1_1: 10.0.0.3/31
+    ip_eth1_2: 10.0.0.9/31
+  access3:
+    loopback0_ip: 172.16.31.103/32
+    ip_eth1_1: 10.0.0.5/31
+    ip_eth1_2: 10.0.0.11/31

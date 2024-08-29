@@ -1,0 +1,67 @@
+# VLANs for all switches in the 'access' group are enabled and descriptions are
+#  set here.
+# If VLANs need to be added per switch they should be added as 'sonic_vlans:' in
+#  the same format for that switch's 'host_vars' file.
+sonic_vlans:
+  - vlan_id: 1
+    description: "Just One things"
+  - vlan_id: 10
+    description: "Just ten things"
+  - vlan_id: 20
+    description: "Just twenty things"
+
+# Ports for all switches in the 'access' group are enabled and descriptions are
+#  set here.
+# Loopback interfaces must be added to create them.  Currently they do not need to be
+#  set as 'enabled'.
+# If ports need to be added per switch they should be added as 'sonic_interfaces:' in
+#  the same format for that switch's 'host_vars' file.
+sonic_interfaces:
+   - name: Eth1/1
+     description: '"Routed link to dist-1"'
+     enabled: true
+   - name: Eth1/2
+     description: '"Routed link to dist-2"'
+     enabled: true
+   - name: Eth1/8
+     description: '"Access VLAN to PC"'
+     enabled: true
+   - name: Eth1/9
+     description: '"Access VLAN to PC"'
+     enabled: true
+   - name: loopback0
+
+# L3 interfaces for all switches in the 'access' group set here.
+#
+# If L3 interfaces need to be added per switch they should be added as 'sonic_l3_interfaces:'
+#   in the same format for that switch's 'host_vars' file.
+#
+# This performs a lookup to 'host_data' dictionary in 'network.yaml'
+sonic_l3_interfaces:
+  - name: Eth1/1
+    ipv4:
+      addresses:
+        - address: '{{ host_data[inventory_hostname].ip_eth1_1 }}'
+  - name: Eth1/2
+    ipv4:
+      addresses:
+        - address: '{{ host_data[inventory_hostname].ip_eth1_2 }}'
+
+
+# This was the previous try.
+# The problems I found were:
+#   -In Dictionary lookup, no period before the square bracket for variable lookup.
+#   - Can't use '/' or '-'.  I had to switch to '_' or it broke the variable name.
+#sonic_l3_interfaces:
+#  - name: Eth1/1
+#    ipv4:
+#      addresses:
+#        - address: "{{ host_data.[inventory_hostname].ip_Eth1/1 }}"
+#        - address: "{{ ip_eth1-1 }}"
+#  - name: Eth1/2
+#    ipv4:
+#      addresses:
+#        - address: "{{ ptp_IP.[inventory_hostname].ip_Eth1/2 }}"
+#        - address: "{{ ip_eth1-2 }}"
+
+
